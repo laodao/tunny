@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:eibus onapplicationready="appInitiala()">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>首页</title>
+<link href="/css/main.css" rel="stylesheet" type="text/css" />
+<script src="/js/jquery-1.6.min.js"></script>
+<script src="/js/jquery.masonry.min.js"></script>
+<script type="text/javascript" src="/js/jquery.fancybox-1.3.4.pack.js"></script>
+<script src="/js/moment.min.js"></script>
+<script src="/js/ejsv8.js"></script>
+<link rel="stylesheet" href="/css/jquery.fancybox-1.3.4.css" type="text/css" media="screen" />
+<script>
+	var loadUrl = '/picture/getPicsByTime/';
+	var container;
+	var domain = '<%=domain%>';
+	var lastDate;
+	var itemID;
+	var currentPage = 1;
+	var pics = {};
+	//元素放置到屏幕中间
+	(function($){
+		$.fn.center = function(){
+		var top = ($(window).height() - this.height())/2;
+		var left = ($(window).width() - this.width())/2;
+		var scrollTop = $(document).scrollTop();
+		var scrollLeft = $(document).scrollLeft();
+		return this.css( { position : 'absolute', 'top' : top + scrollTop, left : left + scrollLeft } );
+		}
+	})(jQuery);
+	//初始化时间线
+	$(function(){
+		$.getJSON('/timeLine/get',{'_dataType':'json', 'domain':domain, 'rand':Math.random(), 'date':new Date()}, function(data){
+			var items = data.items;
+			var timeLine = $('#timeLine');
+			timeLine.empty();
+			timeLine.append("<span class=\"mid_time_p\" onclick='getPreTime(this)'></span>");
+			for(var i=0;i<items.length;i++){
+				if(i==items.length-1){
+					timeLine.append("<span title='"+moment(items[i].createDate).format("YYYY年MM月DD日")+"' class=\"mid_time_on\" id='"+items[i]._id+"' onclick='showEverything(this)'></span>");
+					itemID = items[i]._id;
+				}else{
+					timeLine.append("<span title='"+moment(items[i].createDate).format("YYYY年MM月DD日")+"' class=\"mid_time\" id='"+items[i]._id+"' onclick='showEverything(this)'></span>");
+				}
+			}
+			timeLine.append("<span class=\"mid_time_n\" onclick='getNextTime(this)'></span>");
+			container = $('#container');
+			initPage($('.mid_time_on'));
+		});
+	});
+	function initPage(){
+		itemID = $('.mid_time_on').attr('id');
+		appendPic();
+	}
+	function showEverything(obj){
+		currentPage = 1;
+		itemID = obj.id;
+		var _url = loadUrl+itemID+"?_dataType=json";
+		$('.mid_time_on').toggleClass('mid_time_on').toggleClass('mid_time');
+		$(obj).toggleClass('mid_time').toggleClass('mid_time_on');
+		appendPic();
+	}
+	function appendPic(){
+		var _url = loadUrl+itemID+"?_dataType=json";
+		container.empty();
+		$.getJSON(_url, function(data){
+			if(data&&data.pictures&&data.pictures.length>0){
+				$(data.pictures).each(function(i){
+					if(i<data.pictures.length-1){
+						this.nextPic = data.pictures[i+1];
+					}
+					pics[this._id] = this;
+				});
+				currentPage++;
+				var html = dom.ejs("col_tml", data);
+				var elements = $(html).find('.col');
+				//var elements = $( newElements ).css({ opacity: 0 });
+				container.append(elements);
+				elements.animate({ opacity: 'show', speed: 5000  });
+				container.imagesLoaded(function(){
+					container.masonry({
+						itemSelector: '.col',
+						columnWidth: 6,
+						animationOptions : { opacity: 1, speed: 5000  }
+					}).masonry('reload');
+				});
+			}
+		});
+	}
+	function getPreTime(obj){
+		
+	}
+	//显示图片到流布局容器
+	function renderCol(data){
+		if(data&&data.pictures&&data.pictures.length>0){
+			currentPage++;
+			var html = dom.ejs("col_tml", data);
+			var newElements = $(html).find('.col');
+			var elements = $( newElements ).css({ opacity: 0 });
+			elements.animate({ opacity: 'show', speed: 5000  });
+			elements.imagesLoaded(function(){
+				elements.animate({ opacity: 1 });
+				container.append(elements).masonry( 'appended', elements).masonry('reload');
+			});
+			//container.reload();
+			//container.masonry({
+			//	itemSelector: '.col'
+			//});
+			//container.masonry("reload");
+		}
+	}
+	//判断滚动条是否到页面底部
+	function reachBottom() {
+	    var scrollTop = 0;
+	    var clientHeight = 0;
+	    var scrollHeight = 0;
+	    if (document.documentElement && document.documentElement.scrollTop) {
+	        scrollTop = document.documentElement.scrollTop;
+	    } else if (document.body) {
+	        scrollTop = document.body.scrollTop;
+	    }
+	    if (document.body.clientHeight && document.documentElement.clientHeight) {
+	        clientHeight = (document.body.clientHeight < document.documentElement.clientHeight) ? document.body.clientHeight: document.documentElement.clientHeight;
+	    } else {
+	        clientHeight = (document.body.clientHeight > document.documentElement.clientHeight) ? document.body.clientHeight: document.documentElement.clientHeight;
+	    }
+	    scrollHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+	    if (scrollTop + clientHeight == scrollHeight) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
+	//滚动条事件
+	$(window).scroll(function(){
+		if(reachBottom()){
+			var _url = loadUrl+itemID+"?page="+currentPage+"&_dataType=json";
+			$.getJSON(_url, function(data){
+				renderCol(data);
+			});
+		}
+	});
+	//显示图片
+	function viewPic(id){
+		var pic = pics[id];
+		var maskDiv = $('<div id="maskDiv" style="z-index:999;position:absolute"></div>').css('height', document.body.scrollHeight ).css('width', '100%');
+		var picDiv = $(dom.ejs("pic_tml", {pic:pic}));
+		$("body").append(maskDiv);
+		$("body").append(picDiv);
+		picDiv.center();
+		maskDiv.show();
+		picDiv.fadeIn('slow');
+		maskDiv.click(function(){
+			picDiv.fadeOut(2000);
+			picDiv.remove();
+			maskDiv.fadeOut(2000);
+			maskDiv.remove();
+		});
+	}
+</script>
+<script id="pic_tml" type="tmpl">
+<div id="picDiv" style="display:none;z-index:1000;position:absolute;width:500px; height:400px;">
+	<img style="width:500px; height:400px;" src="<&=pic.filePath&>"/>
+</div>
+</script>
+<script id="col_tml" type="tmpl">
+<div id='allcol'>
+<& if (pictures) { &>
+<& pictures.forEach(function(pic, i){ &>
+       <!--图片展示1-->
+       <&if (i==0) {&>
+       <div class="col">
+         <div class=block>
+         <div class=pimg><A href="#" onclick=viewPic('<&=pic._id&>')><IMG src="<&=pic.filePath&>"></A></div>
+         <div class=text>
+                 <P>欢迎大家来到我的第一个空间</P> 
+          </div>
+          <div class="itm clear time"><A href="">2011-10-28<br/>21312312312321</A></div>
+          <div class=info>
+              <div class="itm clear time"><A href="">2011-10-28</A></div>
+              <div class="itm clear hot"><A href="">13</A></div>
+              <div class="itm clear link"><A href="">全文链接</A></div>
+          </div>
+          </div>
+       </div>
+       <& } &>
+       <&if (i>0) {&>
+       <div class="col" >
+         <div class=block2>
+         <div class=pimg2><A href="#" onclick=viewPic('<&=pic._id&>')><IMG src="<&=pic.thumbnail&>"></A>
+			<div class=text>
+                 <P>让人心旷神怡的风景</P> 
+                 <P>让人心旷神怡的风景</P> 
+<&if (i%2==0) {&>
+                 <P>让人心旷神怡的风景</P> 
+                 <P>让人心旷神怡的风景</P> 
+                 <P>让人心旷神怡的风景</P> 
+       <& } &>
+<&if (i%3==0) {&>
+                 <P>让人心旷神怡的风景</P> 
+                 <P>让人心旷神怡的风景</P> 
+                 <P>让人心旷神怡的风景</P> 
+                 <P>让人心旷神怡的风景</P> 
+                 <P>让人心旷神怡的风景</P> 
+                 <P>让人心旷神怡的风景</P> 
+                 <P>让人心旷神怡的风景</P> 
+                 <P>让人心旷神怡的风景</P> 
+       <& } &>
+           </div>
+		</div>
+          </div>
+       </div>
+       <& } &>
+<& }) &>
+<& } &>
+</div>
+</script>
+</head>
+<body >
+<div class="top">
+<h1>Zcool1986</h1>
+<h2>我的人生是有我来决定，一切皆有可能！</h2>
+  <div class="top_menu">
+    <span class="page_btn">首页</span>
+    <span>创建新旅游路线</span>
+    <span><a href="/picture/create" style="color:#666666;">上传图片</a></span>
+      <span>我的圈子</span>
+      <span>设置</span>
+  </div>
+</div>
+<!--顶部top-->
+
+<div id='timeLine' class="mid">
+<!-- 
+  <span class="mid_time_p"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time_on"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time"></span>
+  <span class="mid_time_n"></span>
+ -->
+</div>
+<!--时间线-->
+    
+<div class="left_menu">
+  <div class="right_calendar"> 
+  <input name=""  class="mail_btn"/>
+  </div>
+  <div class="right_calendar"> 
+  <input name=""  class="calendar_btn"/>
+  </div>
+  <div class="right_calendar"> 
+  <input name=""  class="place_btn"/>
+  </div>
+</div>
+<!--左侧菜单/邮件、时间线方式查看、地图方式查看-->
+
+<div class="con" id="container">
+<div><br/><br/><br/><br/><br/></div>
+</div>
+<!--核心内容-->
+</body>
+</html>
