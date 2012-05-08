@@ -26,13 +26,8 @@ var _dataSource = {
 	dev:[
         {
             "host": "127.0.0.1",
-            "database": "album",
-            "username": "",
-            "password": ""
-        },
-        {
-            "host": "127.0.0.1",
-            "database": "chatRoom",
+            "database": "tunny",
+            "port" : 27017,
             "username": "",
             "password": ""
         }
@@ -40,13 +35,8 @@ var _dataSource = {
 	test:[
         {
             "host": "127.0.0.1",
-            "database": "album",
-            "username": "",
-            "password": ""
-        },
-        {
-            "host": "127.0.0.1",
-            "database": "chatRoom",
+            "database": "tunny",
+            "port" : 27017,
             "username": "",
             "password": ""
         }
@@ -54,13 +44,8 @@ var _dataSource = {
 	prd:[
         {
             "host": "127.0.0.1",
-            "database": "album",
-            "username": "",
-            "password": ""
-        },
-        {
-            "host": "127.0.0.1",
-            "database": "chatRoom",
+            "database": "tunny",
+            "port" : 27017,
             "username": "",
             "password": ""
         }
