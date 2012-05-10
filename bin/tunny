@@ -82,6 +82,7 @@ function createApplicationAt(path) {
     mkdir(path + '/model');
     mkdir(path + '/plugins');
     mkdir(path + '/interceptor');
+    mkdir(path + '/filter');
 
     mkdir(path + '/html', function(){
       write(path + '/index.html', index);

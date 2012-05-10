@@ -5,14 +5,13 @@
 /********************************************************************
  * 全局配置
  ********************************************************************/
-exports.staticFileDir = 'static';
 exports.defaultPort = 6060;
 exports.templateSuffix = {"jade":".jade","ejs":"html"};
 exports.templateType = "ejs";
 exports.templatePath = "views";
 exports.baseDir = process.cwd();
 exports.basePath = '';
-exports.staticDir = '/static';
+exports.staticDir = 'static';
 exports.uploadDir = '/upload';
 exports.indexPage = '/index.html';
 exports.err404Page = '/html/404.html';
@@ -69,7 +68,7 @@ exports.socketServices = [
  ********************************************************************/
 exports.sessionConfig = {
 		sessionTimeout : 20,
-		sessionType    : 'local',
+		sessionType    : 'local'
 };
 exports.sessionDSConfig = {
 		port  : 6379,
@@ -85,3 +84,14 @@ exports.sessionDSConfig = {
  ********************************************************************/
 exports.logPath = 'e:/logs/tunny.log';
 exports.logLevel = "INFO";
+
+/********************************************************************
+ * 安全认证配置
+ ********************************************************************/
+exports.authorize = 'on';
+exports.loginUrl = '/login';
+exports.noRight = '/noRight.html';
+exports.noId = "/noId.html";
+exports.logout = '/logout';
+exports.currentUser = 'CURRENT_USER';
+
