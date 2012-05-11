@@ -15,31 +15,7 @@ program
 
 var path = program.args.shift() || '.';
 var eol = 'win32' == os.platform() ? '\r\n' : '\n';
-
-var ejsIndex = [
-    '<!DOCTYPE html>'
-  , '<html>'
-  , ' <head>'
-  , ' <title><%= title %></title>'
-  , ' <link rel=\'stylesheet\' href=\'/stylesheets/style.css\' />'
-  , ' </head>'
-  , ' <body>'
-  , ' <h1><%= title %></h1>'
-  , ' <p>Welcome to <%= title %></p>'
-  , ' </body>'
-  , '</html>'
-].join(eol);
-
-var css = [
-    'body {'
-  , ' padding: 50px;'
-  , ' font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;'
-  , '}'
-  , ''
-  , 'a {'
-  , ' color: #00B7FF;'
-  , '}'
-].join(eol);
+var app = ['var app = require(\'tunny\');', 'app.createServer();'].join(eol);
 
 (function createApplication(path) {
   emptyDirectory(path, function(empty){
@@ -72,29 +48,19 @@ function createApplicationAt(path) {
 
   mkdir(path, function(){
     mkdir(path + '/static');
-    mkdir(path + '/static/javascripts');
+    mkdir(path + '/static/js');
     mkdir(path + '/static/images');
-    mkdir(path + '/static/stylesheets', function(){
-      write(path + '/static/stylesheets/style.css', css);
-    });
+    mkdir(path + '/static/css');
 
     mkdir(path + '/app');
     mkdir(path + '/model');
     mkdir(path + '/plugins');
     mkdir(path + '/interceptor');
-    mkdir(path + '/filter');
+    //mkdir(path + '/filter');
 
-    mkdir(path + '/html', function(){
-      write(path + '/index.html', index);
-    });
+    mkdir(path + '/html');
 
-    mkdir(path + '/views', function(){
-      switch (program.template) {
-        case 'ejs':
-          write(path + '/views/index.ejs', ejsIndex);
-          break;
-      }
-    });
+    mkdir(path + '/views');
 
     write(path + '/app.js', app);
   });
