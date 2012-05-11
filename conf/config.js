@@ -57,7 +57,7 @@ exports.dataSource = _dataSource[exports.env];
  * websocket配置
  ********************************************************************/
 exports.webSocket = 'on';
-exports.socketServices = [
+exports.socketConfig = [
                           {
                         	  namespace  : '/ns2', 
                         	  handler    : 'socketTest'

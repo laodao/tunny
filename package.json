@@ -2,7 +2,7 @@
   "author": "laodao <kingcq@gmail.com> (https://github.com/laodao)",
   "name": "tunny",
   "description": "mvc framework",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "homepage": "https://github.com/laodao/tunny",
   "repository": {
     "url": "git://github.com/laodao/tunny.git"
