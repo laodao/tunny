@@ -9,9 +9,7 @@ var exec = require('child_process').exec
   , os = require('os')
   , fs = require('fs');
 
-program
-  .version(version)
-  .parse(process.argv);
+program.version(version).parse(process.argv);
 
 var path = program.args.shift() || '.';
 var eol = 'win32' == os.platform() ? '\r\n' : '\n';
@@ -22,7 +20,7 @@ var app = ['var app = require(\'tunny\');', 'app.createServer();'].join(eol);
     if (empty || program.force) {
       createApplicationAt(path);
     } else {
-      program.confirm('destination is not empty, continue? ', function(ok){
+      program.confirm('目标目录为空，是否继续? ', function(ok){
         if (ok) {
           process.stdin.destroy();
           createApplicationAt(path);
@@ -38,11 +36,7 @@ function createApplicationAt(path) {
   console.log();
   process.on('exit', function(){
     console.log();
-    console.log(' install dependencies:');
-    console.log(' $ cd %s && npm install', path);
-    console.log();
-    console.log(' run the app:');
-    console.log(' $ node app');
+    console.log('创建app成功，您可以通过node app.js运行app！');
     console.log();
   });
 
@@ -67,12 +61,12 @@ function createApplicationAt(path) {
 }
 
 /**
-* Check if the given directory `path` is empty.
+* 判断文件夹是否为空.
 *
 * @param {String} path
 * @param {Function} fn
 */
-function emptyDirectory(path, fn) {
+function isEmpty(path, fn) {
   fs.readdir(path, function(err, files){
     if (err && 'ENOENT' != err.code) throw err;
     fn(!files || !files.length);

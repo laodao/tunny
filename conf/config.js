@@ -1,7 +1,7 @@
 /**
  * @author lonun@gmail.com
  */
-
+var path = require('path');
 /********************************************************************
  * 全局配置
  ********************************************************************/
@@ -9,7 +9,7 @@ exports.defaultPort = 6060;
 exports.templateSuffix = {"jade":".jade","ejs":"html"};
 exports.templateType = "ejs";
 exports.templatePath = "views";
-exports.baseDir = process.cwd();
+exports.baseDir = path.resolve('.');
 exports.basePath = '';
 exports.staticDir = 'static';
 exports.uploadDir = '/upload';
