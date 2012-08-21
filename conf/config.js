@@ -59,8 +59,8 @@ exports.dataSource = _dataSource[exports.env];
 exports.webSocket = 'on';
 exports.socketConfig = [
                           {
-                        	  namespace  : '/ns2', 
-                        	  handler    : 'socketTest'
+                        	  namespace  : '/ns2', //响应的url
+                        	  handler    : 'socketTest' //app的path
                           }];
 
 /********************************************************************
