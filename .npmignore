@@ -6,3 +6,4 @@ examples
 npm-debug.log
 .gitignore
 .npmignore
+bin
